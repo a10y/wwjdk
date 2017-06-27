@@ -8,3 +8,46 @@ source code, please see either of these:
   * common/doc/building.md     (markdown version)
 
 See http://openjdk.java.net/ for more information about OpenJDK.
+
+-------------------------------------------------
+
+Changes
+=======
+
+I am using a more recent version of BerkeleyDB than expected, but that required
+minimal difference. To build hotspot required to things:
+
+    1. Adding the `--disable-warnings-as-errors` flag to configure
+    2. Apply the below diff in the hotspot/ project:
+
+diff -r fbb9c8026495 src/jdk.hotspot.agent/macosx/native/libsaproc/symtab.c
+--- a/src/jdk.hotspot.agent/macosx/native/libsaproc/symtab.c	Fri Apr 28 02:54:05 2017 -0700
++++ b/src/jdk.hotspot.agent/macosx/native/libsaproc/symtab.c	Tue Jun 27 15:42:19 2017 -0700
+@@ -63,7 +63,7 @@
+     key.size = strlen(key.data) + 1;
+     value.data = &(symtab->symbols[i]);
+     value.size = sizeof(symtab_symbol);
+-    (*symtab->hash_table->put)(symtab->hash_table, &key, &value, 0);
++    (*symtab->hash_table->put)(symtab->hash_table, NULL, &key, &value, 0);
+
+     // check result
+     if (is_debug()) {
+@@ -72,7 +72,7 @@
+       strcpy(tmp, symtab->symbols[i].name);
+       rkey.data = tmp;
+       rkey.size = strlen(tmp) + 1;
+-      (*symtab->hash_table->get)(symtab->hash_table, &rkey, &rvalue, 0);
++      (*symtab->hash_table->get)(symtab->hash_table, NULL, &rkey, &rvalue, 0);
+       // we may get a copy back so compare contents
+       symtab_symbol *res = (symtab_symbol *)rvalue.data;
+       if (strcmp(res->name, symtab->symbols[i].name)  ||
+@@ -371,7 +371,7 @@
+
+   key.data = (char*)(uintptr_t)sym_name;
+   key.size = strlen(sym_name) + 1;
+-  ret = (*symtab->hash_table->get)(symtab->hash_table, &key, &value, 0);
++  ret = (*symtab->hash_table->get)(symtab->hash_table, NULL, &key, &value, 0);
+   if (ret == 0) {
+     symtab_symbol *sym = value.data;
+     uintptr_t rslt = (uintptr_t) ((char*)base + sym->offset);
+
