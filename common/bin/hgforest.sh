@@ -181,8 +181,8 @@ nice_exit () {
 trap 'safe_interrupt' INT QUIT
 trap 'nice_exit' EXIT
 
-subrepos="corba jaxp jaxws langtools jdk hotspot nashorn"
-jdk_subrepos_extra="closed jdk/src/closed jdk/make/closed jdk/test/closed hotspot/make/closed hotspot/src/closed hotspot/test/closed"
+subrepos="corba jaxp jaxws langtools nashorn"
+jdk_subrepos_extra=""
 subrepos_extra="$jdk_subrepos_extra deploy install sponsors pubs"
 
 # Only look in specific locations for possible forests (avoids long searches)

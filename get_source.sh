@@ -92,9 +92,19 @@ if [ $hgmajor -lt $rqstmajor -o \( $hgmajor -eq $rqstmajor -a $hgminor -lt $rqst
   warning "Mercurial version $rqstmajor.$rqstminor.$rqstrev or later is recommended. $hgwhere is version $hgversion"
 fi
 
+# Make fake directories to prevent hotspot and jdk from loading directly from OpenJDK sources
+# as we override them with our own repos.
+mkdir -p hotspot jdk
 
 # Get clones of all absent nested repositories (harmless if already exist)
 sh ./common/bin/hgforest.sh clone "$@" || exit $?
+
+# Delete the placeholder repos
+rm -rf hotspot jdk
+
+# Clone both repos
+git clone git@github.com:a10y/wwjdk-jdk.git jdk
+git clone git@github.com:a10y/wwjdk-hotspot.git hotspot
 
 # Update all existing repositories to the latest sources
 sh ./common/bin/hgforest.sh pull -u
